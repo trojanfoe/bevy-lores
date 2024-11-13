@@ -58,14 +58,10 @@ fn setup(
         ..default()
     };
 
-    // fill image.data with zeroes
+    // Fill image.data with zeroes
     render_texture.resize(size);
 
     let render_texture_handle = images.add(render_texture);
-
-    //
-    // Everything that needs to be rendered, needs to be assigned to render layer #1
-    //
 
     let cube_handle = meshes.add(Cuboid::new(4.0, 4.0, 4.0));
     let cube_material_handle = materials.add(StandardMaterial {
@@ -83,17 +79,15 @@ fn setup(
             ..default()
         },
         Cube,
-        RenderLayers::layer(1),
     ));
 
-    commands.spawn((
-        PointLightBundle {
-            transform: Transform::from_translation(Vec3::new(0.0, 0.0, 10.0)),
-            ..default()
-        },
-        RenderLayers::layer(1),
-    ));
+    commands.spawn((PointLightBundle {
+        transform: Transform::from_translation(Vec3::new(0.0, 0.0, 10.0)),
+        ..default()
+    },));
 
+    // The camera to render all entities on render layer #0, which is the default layer for
+    // entities, unless otherwise specified.
     commands.spawn((
         Camera3dBundle {
             camera: Camera {
@@ -107,12 +101,12 @@ fn setup(
                 .looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         },
-        RenderLayers::layer(1),
+        RenderLayers::layer(0),
     ));
 
     //
     // A sprite and orthographic camera is used to present the render texture.
-    // These are on render layer #0
+    // These are on render layer #1
     //
     commands.spawn((
         SpriteBundle {
@@ -127,10 +121,10 @@ fn setup(
             transform: Transform::from_scale(Vec3::splat(4.0)),
             ..default()
         },
-        RenderLayers::layer(0),
+        RenderLayers::layer(1),
     ));
 
-    commands.spawn((Camera2dBundle::default(), RenderLayers::layer(0)));
+    commands.spawn((Camera2dBundle::default(), RenderLayers::layer(1)));
 }
 
 fn cube_rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Cube>>) {
